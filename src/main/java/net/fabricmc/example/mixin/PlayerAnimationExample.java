@@ -1,6 +1,7 @@
 package net.fabricmc.example.mixin;
 
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
+import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.fabricmc.example.IExampleAnimatedPlayer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,7 +30,18 @@ public class PlayerAnimationExample {
                 var animationContainer = ((IExampleAnimatedPlayer)user).modid_getModAnimation();
 
                 //Use setAnimation to set the current animation. It will be played automatically.
-                animationContainer.setAnimation(new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new Identifier("modid", "waving"))));
+                KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(new Identifier("modid", "waving"));
+
+                // Requested API, disable parts of animation.
+                // Following code disables the left leg (since API 0.4.0)
+                var builder = anim.mutableCopy();
+                var part = builder.getPart("leftLeg");
+                part.setEnabled(false);
+
+                // done modifying rules
+                anim = builder.build();
+
+                animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
 
                 //Use animationContainer.replaceAnimationWithFade(); to create fading effects instead of sudden changes.
             }
